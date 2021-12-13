@@ -34,6 +34,9 @@ def run_game():
 
 
 def evaluate_action_result(robot: Robot, state: State) -> None:
+    """Called when an action is finished to evaluate its impact on the state
+    An action can be finished while the conditions are not right, it is not a bug but
+    an error in strategy"""
     if robot.action.type == ActionType.MOVE:
         robot.location = robot.action.destination
         logging.info(f"{robot.serial} has arrived to {robot.location}")
@@ -66,7 +69,7 @@ def evaluate_action_result(robot: Robot, state: State) -> None:
     ):
         number_sold = state.sell_foobars()
         logging.info(
-            f"{robot.serial} sold {number_sold} foobars"
+            f"{robot.serial} sold {number_sold} foobars "
             f"({len(state.foobar_inventory)} in inventory)"
         )
         return

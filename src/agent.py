@@ -35,7 +35,7 @@ class Agent:
         The strategy is to prioritize buying, over selling, over assembling, over
         mining foo, over mining bar
         When we have available task covered by at least one robot, we put it in an
-        already covered task"""
+        already covered task with a priority order and ideal quantity in mind"""
         logging.debug(f"Choosing action for robot {robot.serial}")
         if (
             len(state.foo_inventory) >= 6
@@ -103,6 +103,7 @@ class Agent:
         raise ValueError("Unknown activity")
 
     def make_robot_do_(self, robot: Robot, state: State, action_str: str):
+        """Put the robot in the corresponding list and add the needed action"""
         if action_str not in [
             "mining_foo",
             "mining_bar",
