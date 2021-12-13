@@ -5,7 +5,7 @@ from src.model.action import ActionType
 from src.model.robot import Location, Robot
 from src.model.state import GAME_STATE
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.INFO)
 
 
 def run_game():
@@ -26,27 +26,28 @@ def run_game():
             ):
                 evaluate_action_result(robot)
             GAME_AGENT.choose_action_for_robot(robot, GAME_STATE)
+            logging.info(f"{robot.serial} will {robot.action}")
             if robot.action.type == ActionType.BUY:
                 evaluate_action_result(robot)
-        GAME_STATE.current_turn = GAME_STATE.current_turn + 1
-    logging.info(f"Game finished in {GAME_STATE.current_turn / 2}s")
+        GAME_STATE.current_turn += 1
+    logging.info(f"Game finished in {(GAME_STATE.current_turn-1)/2}s")
 
 
 def evaluate_action_result(robot: Robot) -> None:
     if robot.action.type == ActionType.MOVE:
         robot.location = robot.action.destination
-        logging.info(f"Robot {robot.serial} has arrived to {robot.location}")
+        logging.info(f"{robot.serial} has arrived to {robot.location}")
         return
     if robot.action.type == ActionType.MINE_FOO and robot.location == Location.FOO:
         GAME_STATE.add_foo()
         logging.info(
-            f"Robot {robot.serial} mined 1 foo ({len(GAME_STATE.foo_inventory)} in inventory)"
+            f"{robot.serial} mined 1 foo ({len(GAME_STATE.foo_inventory)} in inventory)"
         )
         return
     if robot.action.type == ActionType.MINE_BAR and robot.location == Location.BAR:
         GAME_STATE.add_bar()
         logging.info(
-            f"Robot {robot.serial} mined 1 bar ({len(GAME_STATE.bar_inventory)} in inventory)"
+            f"{robot.serial} mined 1 bar ({len(GAME_STATE.bar_inventory)} in inventory)"
         )
         return
     if (
@@ -59,12 +60,12 @@ def evaluate_action_result(robot: Robot) -> None:
         if roll <= 60:
             GAME_STATE.add_foobar()
             logging.info(
-                f"Robot {robot.serial} successfully assembled 1 foobar ({roll=}) "
+                f"{robot.serial} successfully assembled 1 foobar ({roll=}) "
                 f"({len(GAME_STATE.foobar_inventory)} in inventory)"
             )
         else:
             logging.info(
-                f"Robot {robot.serial} tried to assemble a foobar but failed ({roll=})"
+                f"{robot.serial} tried to assemble a foobar but failed ({roll=})"
             )
             GAME_STATE.lose_foo()
         return
@@ -75,7 +76,7 @@ def evaluate_action_result(robot: Robot) -> None:
     ):
         number_sold = GAME_STATE.sell_foobars()
         logging.info(
-            f"Robot {robot.serial} sold {number_sold} foobars"
+            f"{robot.serial} sold {number_sold} foobars"
             f"({len(GAME_STATE.foobar_inventory)} in inventory)"
         )
         return
@@ -87,11 +88,11 @@ def evaluate_action_result(robot: Robot) -> None:
     ):
         number_bought = GAME_STATE.buy_robots()
         logging.info(
-            f"Robot {robot.serial} bought {number_bought} robots "
+            f"{robot.serial} bought {number_bought} robots "
             f"({len(GAME_STATE.robot_list)} working robots)"
         )
         return
     logging.error(
-        f"Robot {robot.serial} tried to do {robot.action} at {robot.location} while "
+        f"{robot.serial} tried to do {robot.action} at {robot.location} while "
         f"{GAME_STATE} which was not supported"
     )

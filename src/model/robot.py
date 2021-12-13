@@ -2,12 +2,12 @@ from src.model.action import Action
 
 
 class Location:
-    HOME = "home"
-    FOO = "foo"
-    BAR = "bar"
-    ASSEMBLY = "assembly"
-    SELL = "sell"
-    BUY = "buy"
+    HOME = "HOME"
+    FOO = "FOO_LOCATION"
+    BAR = "BAR_LOCATION"
+    ASSEMBLY = "ASSEMBLY"
+    SELL = "SELL_LOCATION"
+    BUY = "BUY_LOCATION"
 
 
 class Robot:

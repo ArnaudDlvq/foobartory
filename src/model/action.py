@@ -7,12 +7,12 @@ class UnsupportedActionType(Exception):
 
 
 class ActionType:
-    MOVE = "move"
-    MINE_FOO = "mine_foo"
-    MINE_BAR = "mine_bar"
-    ASSEMBLE = "assemble"
-    SELL = "sell"
-    BUY = "buy"
+    MOVE = "MOVE"
+    MINE_FOO = "MINE_FOO"
+    MINE_BAR = "MINE_BAR"
+    ASSEMBLE = "ASSEMBLE"
+    SELL = "SELL"
+    BUY = "BUY"
 
 
 class Action:
@@ -28,6 +28,8 @@ class Action:
         self.destination = destination
 
     def __str__(self):
+        if self.type == ActionType.MOVE:
+            return f"{ActionType.MOVE} to {self.destination}"
         return f"{self.type}"
 
     @staticmethod
