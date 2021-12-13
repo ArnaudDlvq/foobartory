@@ -42,37 +42,37 @@ class Agent:
             and state.money >= 3
             and (len(self.buying) == 0 or robot in self.buying)
         ):
-            self.make_robot_do_(robot, state, "buying")
+            self.make_robot_do(robot, state, "buying")
             return
         if len(state.foobar_inventory) >= 5 and (
             len(self.selling) == 0 or robot in self.selling
         ):
-            self.make_robot_do_(robot, state, "selling")
+            self.make_robot_do(robot, state, "selling")
             return
         if (
             len(state.foo_inventory) > 6
             and len(state.bar_inventory) >= 1
             and (len(self.assembling) == 0 or robot in self.assembling)
         ):
-            self.make_robot_do_(robot, state, "assembling")
+            self.make_robot_do(robot, state, "assembling")
             return
         if len(self.mining_foo) == 0 or robot in self.mining_foo:
-            self.make_robot_do_(robot, state, "mining_foo")
+            self.make_robot_do(robot, state, "mining_foo")
             return
         if len(self.mining_bar) == 0 or robot in self.mining_bar:
-            self.make_robot_do_(robot, state, "mining_bar")
+            self.make_robot_do(robot, state, "mining_bar")
             return
         # All available tasks are covered
         if len(self.selling) <= len(self.assembling):
-            self.make_robot_do_(robot, state, "selling")
+            self.make_robot_do(robot, state, "selling")
             return
         if len(self.assembling) <= len(self.mining_foo):
-            self.make_robot_do_(robot, state, "assembling")
+            self.make_robot_do(robot, state, "assembling")
             return
         if len(self.mining_foo) <= 2 * len(self.mining_bar):
-            self.make_robot_do_(robot, state, "mining_foo")
+            self.make_robot_do(robot, state, "mining_foo")
             return
-        self.make_robot_do_(robot, state, "mining_bar")
+        self.make_robot_do(robot, state, "mining_bar")
 
     @staticmethod
     def get_associated_location(action_str: str) -> str:
@@ -102,7 +102,7 @@ class Agent:
             return ActionType.BUY
         raise ValueError("Unknown activity")
 
-    def make_robot_do_(self, robot: Robot, state: State, action_str: str):
+    def make_robot_do(self, robot: Robot, state: State, action_str: str):
         """Put the robot in the corresponding list and add the needed action"""
         if action_str not in [
             "mining_foo",

@@ -53,14 +53,14 @@ def test_make_robot_do_ok_case():
     robot = Robot(1)
     state = State()
     state.current_turn = randint(2, 15)
-    agent.make_robot_do_(robot, state, "mining_foo")
+    agent.make_robot_do(robot, state, "mining_foo")
     assert robot in agent.mining_foo
     assert robot.action.start == state.current_turn
     assert robot.action.type == ActionType.MOVE
     assert robot.action.destination == Location.FOO
     state.current_turn = randint(16, 25)
     robot.location = Location.FOO
-    agent.make_robot_do_(robot, state, "mining_foo")
+    agent.make_robot_do(robot, state, "mining_foo")
     assert robot in agent.mining_foo
     assert robot.action.start == state.current_turn
     assert robot.action.type == ActionType.MINE_FOO
@@ -72,4 +72,4 @@ def test_make_robot_do_error_case():
     state = State()
     state.current_turn = randint(2, 15)
     with pytest.raises(ValueError):
-        agent.make_robot_do_(robot, state, "macarena")
+        agent.make_robot_do(robot, state, "macarena")
