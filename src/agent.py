@@ -19,7 +19,7 @@ class Agent:
             f" {self.buying=}"
         )
 
-    def _put_robot_in(self, robot: Robot, list_name: str):
+    def put_robot_in(self, robot: Robot, list_name: str):
         """Put a robot in the designated list and try to remove it from all others"""
         agent_lists = ["mining_foo", "mining_bar", "assembling", "selling", "buying"]
         agent_lists.remove(list_name)
@@ -42,83 +42,84 @@ class Agent:
             and state.money >= 3
             and (len(self.buying) == 0 or robot in self.buying)
         ):
-            self.make_robot_buy(robot, state)
+            self.make_robot_do_(robot, state, "buying")
             return
         if len(state.foobar_inventory) >= 5 and (
             len(self.selling) == 0 or robot in self.selling
         ):
-            self.make_robot_sell(robot, state)
+            self.make_robot_do_(robot, state, "selling")
             return
         if (
             len(state.foo_inventory) > 6
             and len(state.bar_inventory) >= 1
             and (len(self.assembling) == 0 or robot in self.assembling)
         ):
-            self.make_robot_assemble(robot, state)
+            self.make_robot_do_(robot, state, "assembling")
             return
         if len(self.mining_foo) == 0 or robot in self.mining_foo:
-            self.make_robot_mine_foo(robot, state)
+            self.make_robot_do_(robot, state, "mining_foo")
             return
         if len(self.mining_bar) == 0 or robot in self.mining_bar:
-            self.make_robot_mine_bar(robot, state)
+            self.make_robot_do_(robot, state, "mining_bar")
             return
         # All available tasks are covered
         if len(self.selling) <= len(self.assembling):
-            self.make_robot_sell(robot, state)
+            self.make_robot_do_(robot, state, "selling")
             return
         if len(self.assembling) <= len(self.mining_foo):
-            self.make_robot_assemble(robot, state)
+            self.make_robot_do_(robot, state, "assembling")
             return
         if len(self.mining_foo) <= 2 * len(self.mining_bar):
-            self.make_robot_mine_foo(robot, state)
+            self.make_robot_do_(robot, state, "mining_foo")
             return
-        self.make_robot_mine_bar(robot, state)
+        self.make_robot_do_(robot, state, "mining_bar")
 
-    def make_robot_buy(self, robot: Robot, state: State):
-        if robot not in self.buying:
-            self._put_robot_in(robot, "buying")
-        if robot.location != Location.BUY:
-            robot.action = Action(state.current_turn, ActionType.MOVE, Location.BUY)
+    @staticmethod
+    def get_associated_location(action_str: str) -> str:
+        if action_str == "mining_foo":
+            return Location.FOO
+        if action_str == "mining_bar":
+            return Location.BAR
+        if action_str == "assembling":
+            return Location.ASSEMBLY
+        if action_str == "selling":
+            return Location.SELL
+        if action_str == "buying":
+            return Location.BUY
+        raise ValueError("Unknown activity")
+
+    @staticmethod
+    def get_associated_action(action_str: str) -> str:
+        if action_str == "mining_foo":
+            return ActionType.MINE_FOO
+        if action_str == "mining_bar":
+            return ActionType.MINE_BAR
+        if action_str == "assembling":
+            return ActionType.ASSEMBLE
+        if action_str == "selling":
+            return ActionType.SELL
+        if action_str == "buying":
+            return ActionType.BUY
+        raise ValueError("Unknown activity")
+
+    def make_robot_do_(self, robot: Robot, state: State, action_str: str):
+        if action_str not in [
+            "mining_foo",
+            "mining_bar",
+            "assembling",
+            "selling",
+            "buying",
+        ]:
+            raise ValueError("Unknown activity")
+        if robot not in getattr(self, action_str):
+            self.put_robot_in(robot, action_str)
+        location = Agent.get_associated_location(action_str)
+        if robot.location != location:
+            robot.action = Action(state.current_turn, ActionType.MOVE, location)
         else:
-            robot.action = Action(state.current_turn, ActionType.BUY)
-
-    def make_robot_sell(self, robot: Robot, state: State):
-        if robot not in self.selling:
-            self._put_robot_in(robot, "selling")
-        if robot.location != Location.SELL:
-            robot.action = Action(state.current_turn, ActionType.MOVE, Location.SELL)
-        else:
-            robot.action = Action(state.current_turn, ActionType.SELL)
-
-    def make_robot_assemble(self, robot: Robot, state: State):
-        if robot not in self.assembling:
-            self._put_robot_in(robot, "assembling")
-        if robot.location != Location.ASSEMBLY:
             robot.action = Action(
-                state.current_turn, ActionType.MOVE, Location.ASSEMBLY
+                state.current_turn, Agent.get_associated_action(action_str)
             )
-            return
-        else:
-            robot.action = Action(state.current_turn, ActionType.ASSEMBLE)
-            return
-
-    def make_robot_mine_foo(self, robot: Robot, state: State):
-        if robot not in self.mining_foo:
-            self._put_robot_in(robot, "mining_foo")
-        if robot.location != Location.FOO:
-            robot.action = Action(state.current_turn, ActionType.MOVE, Location.FOO)
-        else:
-            robot.action = Action(state.current_turn, ActionType.MINE_FOO)
-
-    def make_robot_mine_bar(self, robot: Robot, state: State):
-        if robot not in self.mining_bar:
-            self._put_robot_in(robot, "mining_bar")
-        if robot.location != Location.BAR:
-            robot.action = Action(state.current_turn, ActionType.MOVE, Location.BAR)
-            return
-        else:
-            robot.action = Action(state.current_turn, ActionType.MINE_BAR)
-            return
 
 
 GAME_AGENT = Agent()
