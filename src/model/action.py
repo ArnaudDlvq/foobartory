@@ -1,4 +1,9 @@
+import logging
 from random import randint
+
+
+class UnsupportedActionType(Exception):
+    """Exception to raise when a given action type was not handled by a function"""
 
 
 class ActionType:
@@ -39,3 +44,5 @@ class Action:
             return 20
         if action_type == ActionType.BUY:
             return 0
+        logging.error(f"Unsupported action type: {action_type}")
+        raise UnsupportedActionType(f"Unsupported action type: {action_type}")
